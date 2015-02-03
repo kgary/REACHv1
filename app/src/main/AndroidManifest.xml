@@ -24,6 +24,7 @@
             android:name=".STOP"
             android:label="@string/title_activity_stop" >
         </activity>
+        <activity android:name=".Preferences"/>
     </application>
 
 </manifest>

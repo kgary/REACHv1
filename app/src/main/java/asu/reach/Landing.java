@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -17,6 +18,7 @@ public class Landing extends Activity implements View.OnClickListener {
 
     private int stopPosition=0;
     private ImageButton dd,stic,stop,relax;
+    private Button admin;
     private ImageView blob;
 
     @Override
@@ -42,6 +44,10 @@ public class Landing extends Activity implements View.OnClickListener {
 
         AnimationDrawable anim = (AnimationDrawable) blob.getBackground();
         anim.start();
+
+        /* Chinmay Dhekne edit starts*/
+        admin = (Button) findViewById(R.id.admin_button);
+        admin.setOnClickListener(this);
     }
 
 
@@ -57,6 +63,10 @@ public class Landing extends Activity implements View.OnClickListener {
         }
         if(v.getId() == stop.getId()){
             Intent intent = new Intent(this, STOP.class);
+            startActivity(intent);
+        }
+        if(v.getId()==admin.getId()){
+            Intent intent = new Intent(this, Preferences.class);
             startActivity(intent);
         }
     }

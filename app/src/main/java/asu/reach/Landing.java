@@ -1,6 +1,8 @@
 package asu.reach;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
@@ -10,8 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 
 public class Landing extends Activity implements View.OnClickListener {
@@ -20,6 +24,7 @@ public class Landing extends Activity implements View.OnClickListener {
     private ImageButton dd,stic,stop,relax;
     private Button admin;
     private ImageView blob;
+    private Button okDialogButton,cancelDialogButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +71,35 @@ public class Landing extends Activity implements View.OnClickListener {
             startActivity(intent);
         }
         if(v.getId()==admin.getId()){
-            Intent intent = new Intent(this, Preferences.class);
-            startActivity(intent);
+            final Context context = this;
+            final Dialog dialog = new Dialog(context);
+            dialog.setContentView(R.layout.admin_pwd_pop_up);
+            dialog.setTitle("Enter Admin Password");
+            okDialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+            cancelDialogButton = (Button) dialog.findViewById(R.id.dialogButtonCancel);
+            okDialogButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditText pwdText = (EditText) findViewById(R.id.pwd_editText);
+                    Intent intent = new Intent(Landing.this, Preferences.class);
+                    startActivity(intent);
+                    /*if(pwdText.getText().equals("73224")){
+                        Intent intent = new Intent(Landing.this, Preferences.class);
+                        startActivity(intent);
+                    }
+                    else{
+                        Toast toast = Toast.makeText(getApplicationContext(),"Invalid Password. Please Try Again",Toast.LENGTH_SHORT);
+                        toast.show();
+                    }*/
+                }
+            });
+            cancelDialogButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v){
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
         }
     }
 

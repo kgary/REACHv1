@@ -1,7 +1,9 @@
 package asu.reach;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -15,8 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
-
+import java.io.*;
+import java.sql.*;
 
 public class Landing extends Activity implements View.OnClickListener {
 
@@ -25,6 +27,7 @@ public class Landing extends Activity implements View.OnClickListener {
     private Button admin;
     private ImageView blob;
     private Button okDialogButton,cancelDialogButton;
+    public AlarmManager aManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,41 @@ public class Landing extends Activity implements View.OnClickListener {
         /* Chinmay Dhekne edit starts*/
         admin = (Button) findViewById(R.id.admin_button);
         admin.setOnClickListener(this);
+        /*aManager= (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        setRepeatingAlarm();*/
+        DBHandler myDbHandler = new DBHandler(getApplicationContext());
+        myDbHandler = new DBHandler(this);
+
+        try {
+
+            myDbHandler.createDataBase();
+
+        } catch (IOException ioe) {
+
+            throw new Error("Unable to create database");
+
+        }
+
+        try {
+
+            myDbHandler.openDataBase();
+
+        }catch(SQLException sqle){
+
+            sqle.getMessage();
+
+        }
+
+    }
+
+
+
+    public void setRepeatingAlarm() {
+        Intent intent = new Intent(this, NotifManager.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0,
+                intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        aManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                (5 * 1000), pendingIntent);
     }
 
 

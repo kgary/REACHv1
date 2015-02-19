@@ -2,6 +2,7 @@ package asu.reach;
 
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.*;
 import java.io.*;
 import java.sql.SQLException;
@@ -26,6 +27,17 @@ public class DBHandler extends SQLiteOpenHelper{
 
         super(context, DB_NAME, null, 1);
         this.myContext = context;
+    }
+
+    public boolean checkAdminPwd(String pwdToBeChecked){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select * from Administrator where Admin_pwd="+pwdToBeChecked,null);
+        while(c.moveToNext()){
+            if(c.getString(0).equals(pwdToBeChecked))
+                return true;
+
+        }
+        return false;
     }
 
     /**

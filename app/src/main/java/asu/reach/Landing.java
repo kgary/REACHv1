@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import java.io.*;
 import java.sql.*;
 
@@ -118,10 +121,13 @@ public class Landing extends Activity implements View.OnClickListener {
             okDialogButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    openAdminPwdDialog();
+                    /*SQLiteDatabase db = this.getWritableDatabase();
+                    Cursor cursor = db.rawQuery(selectQuery, null);
                     EditText pwdText = (EditText) findViewById(R.id.pwd_editText);
                     Intent intent = new Intent(Landing.this, Preferences.class);
-                    startActivity(intent);
-                    /*if(pwdText.getText().equals("73224")){
+                    startActivity(intent);*/
+                    /*if(pwdText.getText().toString().equals("73224")){
                         Intent intent = new Intent(Landing.this, Preferences.class);
                         startActivity(intent);
                     }
@@ -155,9 +161,51 @@ public class Landing extends Activity implements View.OnClickListener {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+//            openAdminPwdDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void openAdminPwdDialog()
+    {
+        final Context context = this;
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.admin_pwd_pop_up);
+        dialog.setTitle("Enter Admin Password");
+        okDialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+        cancelDialogButton = (Button) dialog.findViewById(R.id.dialogButtonCancel);
+        okDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText pwdText = (EditText) findViewById(R.id.pwd_editText);
+                Intent intent = new Intent(Landing.this, Preferences.class);
+                DBHandler db = new DBHandler(getApplicationContext());
+                boolean pwdMatch = db.checkAdminPwd(pwdText.getText().toString());
+                if(pwdMatch)
+                    startActivity(intent);
+                else{
+                    Toast toast = Toast.makeText(getApplicationContext(),"Invalid Password. Please Try Again",Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+
+                    /*if(pwdText.getText().equals("73224")){
+                        Intent intent = new Intent(Landing.this, Preferences.class);
+                        startActivity(intent);
+                    }
+                    else{
+                        Toast toast = Toast.makeText(getApplicationContext(),"Invalid Password. Please Try Again",Toast.LENGTH_SHORT);
+                        toast.show();
+                    }*/
+            }
+        });
+        cancelDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     @Override

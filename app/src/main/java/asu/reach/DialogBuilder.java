@@ -1,20 +1,29 @@
 package asu.reach;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
-public class DialogBuilder extends DialogFragment{
+public class DialogBuilder extends DialogFragment {
 
     private static EditText pin;
     private static STIC sticActivity;
@@ -22,7 +31,12 @@ public class DialogBuilder extends DialogFragment{
     private static STOP stopActivity;
     private static DailyDiary ddActivity;
     private static WorryHeads whActivity;
-    private static boolean end,date;
+    private static Safe safeActivity;
+    private static SafeWebView safeWebViewActivity;
+    private static boolean end, date;
+
+    public static final String PREFS_NAME = "DoNotShowAgain";
+
 
     public static DialogBuilder newInstance(String title) {
         DialogBuilder frag = new DialogBuilder();
@@ -42,6 +56,7 @@ public class DialogBuilder extends DialogFragment{
         stopActivity = null;
         ddActivity = null;
         whActivity = null;
+        safeActivity = null;        //Safe
         pin = p;
         return frag;
     }
@@ -56,6 +71,7 @@ public class DialogBuilder extends DialogFragment{
         landingActivity = null;
         ddActivity = null;
         whActivity = null;
+        safeActivity = null;        //Safe
         end = e;
         return frag;
     }
@@ -70,6 +86,7 @@ public class DialogBuilder extends DialogFragment{
         stopActivity = null;
         landingActivity = null;
         whActivity = null;
+        safeActivity = null;        //Safe
         end = e;
         date = d;
         return frag;
@@ -85,9 +102,11 @@ public class DialogBuilder extends DialogFragment{
         stopActivity = null;
         ddActivity = null;
         whActivity = null;
+        safeActivity = null;        //Safe
         pin = p;
         return frag;
     }
+
     public static DialogBuilder newInstance(String title, WorryHeads a) {
         DialogBuilder frag = new DialogBuilder();
         Bundle args = new Bundle();
@@ -98,19 +117,56 @@ public class DialogBuilder extends DialogFragment{
         landingActivity = null;
         stopActivity = null;
         ddActivity = null;
+        safeActivity = null;        //Safe
+        return frag;
+    }
+
+    //Safe
+    public static DialogBuilder newInstance(String title, Safe a) {
+        DialogBuilder frag = new DialogBuilder();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        frag.setArguments(args);
+        safeActivity = a;
+        sticActivity = null;
+        whActivity = null;
+        landingActivity = null;
+        stopActivity = null;
+        ddActivity = null;
+        ddActivity = null;
+        return frag;
+    }
+
+    public static DialogBuilder newInstance(String title, SafeWebView a) {
+        DialogBuilder frag = new DialogBuilder();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        frag.setArguments(args);
+        safeWebViewActivity = a;
+        safeActivity = null;
+        sticActivity = null;
+        whActivity = null;
+        landingActivity = null;
+        stopActivity = null;
+        ddActivity = null;
         return frag;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (getDialog() == null)
+            setShowsDialog(false);
+        else
         getDialog().setCanceledOnTouchOutside(false);
         return super.onCreateView(inflater, container, savedInstanceState);
+
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         String title = getArguments().getString("title");
-        if(landingActivity != null){
+
+        if (landingActivity != null) {
             pin.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
             return new AlertDialog.Builder(getActivity())
                     .setIcon(R.drawable.ic_launcher)
@@ -120,7 +176,7 @@ public class DialogBuilder extends DialogFragment{
                     .setNegativeButton("Cancel", landingActivity)
                     .create();
         }
-        if(sticActivity != null) {
+        if (sticActivity != null) {
             pin.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
             return new AlertDialog.Builder(getActivity())
                     .setIcon(R.drawable.ic_launcher)
@@ -130,8 +186,8 @@ public class DialogBuilder extends DialogFragment{
                     .setNegativeButton("Cancel", sticActivity)
                     .create();
         }
-        if(stopActivity != null){
-            if(end) {
+        if (stopActivity != null) {
+            if (end) {
                 return new AlertDialog.Builder(getActivity())
                         .setIcon(R.drawable.ic_launcher)
                         .setTitle(title)
@@ -139,7 +195,7 @@ public class DialogBuilder extends DialogFragment{
                         .setPositiveButton("Yes", stopActivity)
                         .setNegativeButton("Cancel", stopActivity)
                         .create();
-            }else{
+            } else {
                 return new AlertDialog.Builder(getActivity())
                         .setIcon(R.drawable.ic_launcher)
                         .setTitle(title)
@@ -149,8 +205,8 @@ public class DialogBuilder extends DialogFragment{
                         .create();
             }
         }
-        if(ddActivity != null){
-            if(!date) {
+        if (ddActivity != null) {
+            if (!date) {
                 if (end) {
                     return new AlertDialog.Builder(getActivity())
                             .setIcon(R.drawable.ic_launcher)
@@ -168,7 +224,7 @@ public class DialogBuilder extends DialogFragment{
                             .setNegativeButton("Cancel", ddActivity)
                             .create();
                 }
-            }else {
+            } else {
                 final Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
@@ -177,7 +233,7 @@ public class DialogBuilder extends DialogFragment{
                 return new DatePickerDialog(ddActivity, ddActivity, year, month, day);
             }
         }
-        if(whActivity != null){
+        if (whActivity != null) {
             return new AlertDialog.Builder(getActivity())
                     .setIcon(R.drawable.ic_launcher)
                     .setTitle(title)
@@ -186,6 +242,39 @@ public class DialogBuilder extends DialogFragment{
                     .setNegativeButton("Cancel", whActivity)
                     .create();
         }
+
+        final SharedPreferences settings = safeActivity.getSharedPreferences(PREFS_NAME, 0);
+        final SharedPreferences.Editor editor = settings.edit();
+        boolean doNotShowDialog = settings.getBoolean("skipMessage", false);
+        View checkBoxView = View.inflate(safeActivity, R.layout.checkbox, null);
+        final CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+        checkBox.setText("Do not ask me again");
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+                if (isChecked) {
+                    editor.putBoolean("skipMessage", checkBox.isChecked());
+                    editor.commit();
+
+                }
+            }
+        });
+        if (!doNotShowDialog && safeActivity != null) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(safeActivity);
+            builder.setTitle(title);
+            return builder.setMessage("Are you sure you want to Leave?")
+                    .setView(checkBoxView)
+                    .setPositiveButton("Yes", safeActivity)
+                    .setNegativeButton("No", safeActivity)
+                    .create();
+        }
+
+        Intent intent = new Intent(getContext(), Landing.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        getContext().startActivity(intent);
+
         return null;
     }
 }
+

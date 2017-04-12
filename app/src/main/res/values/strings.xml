@@ -10,7 +10,18 @@
     <string name="title_activity_daily_diary">DailyDiary</string>
     <string name="title_activity_blob">Blob</string>
     <string name="title_activity_worry_heads">WorryHeads</string>
+    <string name="title_activity_safe">SAFE</string>
     <string name="prefs">Chinmay;Akshay</string>
     <string name="title_activity_date_preference">DatePreferenceActivity</string>
     <string name="title_activity_Notification">NotificationActivity</string>
+
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
+
+    <string-array name="do_not_show_again_array">
+        <item>Do not show again.</item>
+    </string-array>
+
 </resources>

@@ -1,6 +1,4 @@
 .gradle
-.idea/workspace.xml
-.idea/libraries
 .DS_Store
 
 # Built application files
@@ -29,3 +27,10 @@ proguard/
 
 # Log Files
 *.log
+
+#misc files
+.idea/
+app/app.iml
+REACHv1.iml
+*.iml
+.idea/*
